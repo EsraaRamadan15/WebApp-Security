@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace WebApp_UnderTheHood.Pages.Authorization
+namespace WebApp_UnderTheHood.Authorization
 {
     public class HRManagerProbationRequirement : IAuthorizationRequirement
     {
