@@ -43,6 +43,14 @@ namespace WebApp_Identity.Pages.Account
             }
             else
             {
+                if (result.RequiresTwoFactor)
+                {
+                    return RedirectToPage("/Account/LoginTwoFactorWithAuthenticator",
+                        new
+                        {
+                            this.Credential.RememberMe
+                        });
+                }
 
                 if (result.IsLockedOut)
                 {
@@ -58,16 +66,16 @@ namespace WebApp_Identity.Pages.Account
         }
     }
 
-        public class CredentialViewModel
-        {
-            [Required]
-            public string Email { get; set; } = string.Empty;
+    public class CredentialViewModel
+    {
+        [Required]
+        public string Email { get; set; } = string.Empty;
 
-            [Required]
-            [DataType(DataType.Password)]
-            public string Password { get; set; } = string.Empty;
+        [Required]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = string.Empty;
 
-            [Display(Name = "Remember Me")]
-            public bool RememberMe { get; set; }
-        }
+        [Display(Name = "Remember Me")]
+        public bool RememberMe { get; set; }
     }
+}
