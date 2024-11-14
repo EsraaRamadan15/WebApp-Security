@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Services.AddControllers();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -37,10 +38,27 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
+
 builder.Services.Configure<SmtpSetting>(builder.Configuration.GetSection("SMTP"));
 Configuration.Default.ApiKey.Add("api-key", builder.Configuration["SMTP:ApiKey"]);
 
 builder.Services.AddSingleton<IEmailService, EmailService>();
+builder.Services.AddAuthentication().AddFacebook(options =>
+{
+    options.AppId = builder.Configuration["FacebookAppId"] ?? string.Empty;
+    options.AppSecret = builder.Configuration["FacebookAppSecret"] ?? string.Empty;
+});
 
 
 var app = builder.Build();
@@ -57,10 +75,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseCors("AllowAllOrigins");
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapRazorPages();
+app.MapControllers();
 
 app.Run();

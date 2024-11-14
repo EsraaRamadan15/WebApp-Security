@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -21,9 +23,20 @@ namespace WebApp_Identity.Pages.Account
         public CredentialViewModel Credential { get; set; } = new CredentialViewModel();
 
 
+        [BindProperty]
+        public IEnumerable<AuthenticationScheme> ExternalLoginProviders { get; set; }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
+            this.ExternalLoginProviders = await signInManager.GetExternalAuthenticationSchemesAsync();
+        }
+
+        public IActionResult OnPostLoginExternally(string provider)
+        {
+            var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, null);
+            properties.RedirectUri = Url.Action("ExternalLoginCallback", "Account");
+
+            return Challenge(properties, FacebookDefaults.AuthenticationScheme);
         }
 
 
